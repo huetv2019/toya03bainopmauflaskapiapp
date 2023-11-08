@@ -12,10 +12,12 @@
    ma_debai = toya03bainopmauflaskapiapp
 """
 
-from flask import Flask, jsonify
 import os
+
+import requests
+from flask import Flask
+
 #
-from src.helper import github_request
 
 
 app = Flask(__name__)
@@ -23,18 +25,69 @@ app = Flask(__name__)
 
 @app.route('/')
 def index():
-  pass#todo
+  return {}
 
 
 @app.route('/release')
 def release():
-  pass#todo
+  
+  url = "https://api.github.com"
+  endpoint = "/repos/pyenv/pyenv/releases"
+
+  res = requests.get(url + endpoint)
+
+  if res.status_code == 200:
+
+      data = res.json()
+      releases = []
+      for release in data:
+          created_at = release["created_at"]
+          tag_name = release["tag_name"]
+          body = release["body"]
+          release_info = {
+              "created_at": created_at,
+              "tag_name": tag_name,
+              "body": body
+          }
+          releases.append(release_info)
+      return releases
+  else:
+      return json.dumps({}), 404
 
 
 @app.route('/most_3_recent/release')
 def most_3_recent__release():
-  pass#todo
+  
+  url = "https://api.github.com"
+  endpoint = "/repos/pyenv/pyenv/releases"
+
+  params = {
+      "per_page": 3,  # Get only the first three releases
+      "sort": "created_at",  # Sort by the created_at field
+      "direction": "desc"  # Sort in descending order
+  }
+  res = requests.get(url + endpoint , params=params)
+
+  if res.status_code == 200:
+
+      data = res.json()
+      releases = []
+      for release in data:
+              created_at = release["created_at"]
+              tag_name = release["tag_name"]
+              body = release["body"]
+              release_info = {
+                  "created_at": created_at,
+                  "tag_name": tag_name,
+                  "body": body
+              }
+              releases.append(release_info)
+      return releases
+  else:
+      return json.dumps({}), 404
+ 
+  
 
 
 if __name__=='__main__':
-  app.run(debug=True, port=os.environ.get('PORT', 5000) )
+  app.run(host='0.0.0.0', port=os.environ.get('PORT', 5000), debug=True)
