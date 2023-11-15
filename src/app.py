@@ -13,7 +13,7 @@
 """
 
 import os
-
+import json
 import requests
 from flask import Flask
 
@@ -25,7 +25,7 @@ app = Flask(__name__)
 
 @app.route('/')
 def index():
-  return {}
+  return json.dumps({})
 
 
 @app.route('/release')
@@ -39,17 +39,14 @@ def release():
   if res.status_code == 200:
 
       data = res.json()
-      releases = []
-      for release in data:
-          created_at = release["created_at"]
-          tag_name = release["tag_name"]
-          body = release["body"]
-          release_info = {
-              "created_at": created_at,
-              "tag_name": tag_name,
-              "body": body
-          }
-          releases.append(release_info)
+      releases = [
+        {
+          'created_at' : release['created_at'],
+          'tag_name'   : release['tag_name'],
+          'body'       : release['body'],
+        }
+        for release in data
+      ]
       return releases
   else:
       return json.dumps({}), 404
@@ -71,17 +68,14 @@ def most_3_recent__release():
   if res.status_code == 200:
 
       data = res.json()
-      releases = []
-      for release in data:
-              created_at = release["created_at"]
-              tag_name = release["tag_name"]
-              body = release["body"]
-              release_info = {
-                  "created_at": created_at,
-                  "tag_name": tag_name,
-                  "body": body
-              }
-              releases.append(release_info)
+      releases = [
+        {
+          'created_at' : release['created_at'],
+          'tag_name'   : release['tag_name'],
+          'body'       : release['body'],
+        }
+        for release in data
+      ]
       return releases
   else:
       return json.dumps({}), 404
